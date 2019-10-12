@@ -1,0 +1,15 @@
+
+D	php:S1172"/Remove the unused function parameter "$member".(Ï±³ğ
+]	php:S1192"HDefine a constant instead of duplicating this literal "#weight" 5 times.(íñîª
+[	php:S1192
+"GDefine a constant instead of duplicating this literal "#title" 4 times.(À´ËF
+\	php:S1192*"GDefine a constant instead of duplicating this literal "member" 4 times.(©ÿáã
+i	php:S1192"TDefine a constant instead of duplicating this literal "field_date_of_birth" 3 times.(ò›‹ê
+m	php:S1192"SDefine a constant instead of duplicating this literal "field_joining_date" 3 times.(˜ğ†üÿÿÿÿ
+d	php:S1192*"ODefine a constant instead of duplicating this literal "#default_value" 4 times.(©ÿáã
+[	php:S1192,"FDefine a constant instead of duplicating this literal "value" 4 times.(¯‰–Š
+d	php:S1192"JDefine a constant instead of duplicating this literal "#required" 4 times.(“âÏ¸ùÿÿÿÿ
+Z	php:S1192-"FDefine a constant instead of duplicating this literal "month" 4 times.(®ÙÎ
+b	php:S1192#"HDefine a constant instead of duplicating this literal "actions" 3 times.(Ùèşóùÿÿÿÿ
+Z	php:S1192	"FDefine a constant instead of duplicating this literal "#type" 6 times.(»…ÓW
+8php:S125"Remove this commented out code.(Ğƒ¹úÿÿÿÿ
