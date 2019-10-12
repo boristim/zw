@@ -1,0 +1,16 @@
+name = Band
+description = Musical band
+files[] = inc/BandFields.php
+files[] = inc/EntityBand.php
+files[] = inc/BandController.php
+files[] = inc/BandUIController.php
+dependencies[] = entityreference
+dependencies[] = image
+dependencies[] = list
+dependencies[] = number
+dependencies[] = options
+dependencies[] = text
+dependencies[] = member
+version = "7.x-0.2"
+core = "7.x"
+package = "zw"

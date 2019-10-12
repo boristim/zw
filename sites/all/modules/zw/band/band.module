@@ -1,0 +1,178 @@
+<?php
+/**
+ * Implements hook_entity_info().
+ */
+function band_entity_info() {
+
+  return [
+    'band' => [
+      'label' => t('Band'),
+      'controller class' => 'EntityAPIController',
+      'entity class' => 'EntityBand',
+      'base table' => 'bands_band',
+      'label callback' => '_band_entity_label',
+      'url callback' => '_band_url',
+      'module' => 'band',
+      'fieldable' => TRUE,
+      'access callback' => 'band_access',
+      'entity keys' => [
+        'id' => 'id',
+      ],
+      'admin ui' => array(
+        'path' => 'admin/content/bands',
+        'file' => 'inc/BandUIController.php',
+        'controller class' => 'BandUIController',
+      ),
+      'bundles' => [],
+      'view modes' => [
+        'full' => [
+          'label' => t('Full'),
+          'custom settings' => FALSE,
+        ],
+        'teaser' => [
+          'label' => t('Teaser'),
+          'custom settings' => FALSE,
+        ],
+      ],
+    ],
+  ];
+}
+
+function _band_url($band) {
+  return ['path' => 'band/' . $band->id];
+}
+
+function _band_entity_label($band, $entity_type = NULL) {
+  if (is_numeric($band)) {
+    $band = entity_load('band', [$band]);
+  }
+
+  return isset($band->name) ? $band->name : '';
+}
+
+/**
+ * Implements hook_permission().
+ */
+function band_permission() {
+
+  return [
+    'administer band' => [
+      'title' => t('Administer band'),
+      'restrict access' => TRUE,
+    ],
+    'view band' => [
+      'title' => t('View band'),
+      'restrict access' => TRUE,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_menu().
+ */
+function band_menu() {
+  $items['bands/%'] = [
+    'title callback' => '_band_entity_label',
+    'title arguments' => [1],
+    'page callback' => '_band_page_view',
+    'page arguments' => [1],
+    'access arguments' => ['view band'],
+    'type' => MENU_CALLBACK,
+  ];
+  $items['bands'] = [
+    'title callback' => t('Bands'),
+    'page callback' => '_band_page_view',
+    'access arguments' => ['view band'],
+    'type' => MENU_CALLBACK,
+  ];
+
+  return $items;
+}
+
+function _band_page_view($band = NULL, $view_mode = 'full') {
+  if (!isset($band)) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'band');
+    $bands = $query->execute();
+    if ($bands['band']) {
+      $result = [];
+      foreach ($bands['band'] as $band) {
+        $result[] = _band_page_view($band->id, 'teaser');
+      }
+
+      return $result;
+    }
+
+    return FALSE;
+  }
+
+  if (is_numeric($band)) {
+    $band = entity_load('band', [$band]);
+    $band = reset($band);
+  }
+
+  $band->content = [];
+  $band->title = _band_entity_label($band);
+  field_attach_prepare_view('band', [$band->id => $band], $view_mode);
+  entity_prepare_view('band', [$band->id => $band]);
+  $band->content += field_attach_view('band', $band, $view_mode);
+  $band->content += [
+    '#theme' => 'band',
+    '#element' => $band,
+    '#view_mode' => $view_mode,
+    '#language' => LANGUAGE_NONE,
+  ];
+
+  return $band->content;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function band_theme($existing, $type, $theme, $path) {
+  return [
+    'band' => [
+      'variables' => ['element' => NULL],
+      'template' => 'band'
+    ],
+  ];
+}
+
+function band_access($op, $profile = NULL, $account = NULL) {
+
+  return user_access('administer band');
+}
+
+function _band_members_list($form_state = NULL) {
+
+  return db_query("SELECT id,concat(firstname,' ',lastname) name FROM {bands_members}")->fetchAllKeyed();
+}
+
+function _band_styles() {
+// Maybe loaded from taxonomy
+  return [
+    'imposible' => 'imposible',
+    'Alternative Music' => 'Alternative Music',
+    'Blues' => 'Blues',
+    'Classical Music' => 'Classical Music',
+    'Country Music' => 'Country Music',
+    'Dance Music' => 'Dance Music',
+    'Easy Listening' => 'Easy Listening',
+    'Electronic Music' => 'Electronic Music',
+    'European Music (Folk / Pop)' => 'European Music (Folk / Pop)',
+    'Hip Hop / Rap' => 'Hip Hop / Rap',
+    'Indie Pop' => 'Indie Pop',
+    'Inspirational (incl. Gospel)' => 'Inspirational (incl. Gospel)',
+    'Asian Pop (J-Pop, K-pop)' => 'Asian Pop (J-Pop, K-pop)',
+    'Jazz' => 'Jazz',
+    'Latin Music' => 'Latin Music',
+    'New Age' => 'New Age',
+    'Opera' => 'Opera',
+    'Pop (Popular music)' => 'Pop (Popular music)',
+    'R&B / Soul' => 'R&B / Soul',
+    'Reggae' => 'Reggae',
+    'Rock' => 'Rock',
+    'Singer / Songwriter (inc. Folk)' => 'Singer / Songwriter (inc. Folk)',
+    'World Music / Beats' => 'World Music / Beats',
+  ];
+}

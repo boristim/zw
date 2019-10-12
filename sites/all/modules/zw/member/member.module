@@ -1,0 +1,124 @@
+<?php
+/**
+ * Implements hook_entity_info().
+ */
+function member_entity_info() {
+
+  return [
+    'member' => [
+      'label' => t('Member'),
+      'controller class' => 'EntityAPIController',
+      'entity class' => 'EntityMember',
+      'base table' => 'bands_members',
+      'label callback' => '_member_entity_label',
+      'url callback' => '_member_url',
+      'module' => 'member',
+      'fieldable' => TRUE,
+      'access callback' => 'member_access',
+      'entity keys' => [
+        'id' => 'id',
+      ],
+      'admin ui' => array(
+        'path' => 'admin/content/members',
+        'file' => 'inc/MemberUIController.php',
+        'controller class' => 'MemberUIController',
+      ),
+      'bundles' => [],
+      'view modes' => [
+        'full' => [
+          'label' => t('Full'),
+          'custom settings' => FALSE,
+        ],
+        'teaser' => [
+          'label' => t('Teaser'),
+          'custom settings' => FALSE,
+        ],
+      ],
+    ],
+  ];
+}
+
+function _member_url($member) {
+  return ['path' => 'member/' . $member->id];
+}
+
+function _member_entity_label($entity, $entity_type = NULL) {
+  if (is_numeric($entity)) {
+    $entity = entity_load('member', [$entity]);
+  }
+
+  return (isset($entity->firstname) ? $entity->firstname : '') . (isset($entity->lastname) ? ' ' . $entity->lastname : '');
+}
+
+/**
+ * Implements hook_permission().
+ */
+function member_permission() {
+
+  return [
+    'administer member' => [
+      'title' => t('Administer member'),
+      'restrict access' => TRUE,
+    ],
+    'view member' => [
+      'title' => t('View member'),
+      'restrict access' => TRUE,
+    ],
+  ];
+}
+
+function member_access($op, $profile = NULL, $account = NULL) {
+
+  return user_access('administer member');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function member_menu() {
+
+  $items['member/%'] = [
+    'title callback' => '_member_entity_label',
+    'title arguments' => [1],
+    'page callback' => '_member_page_view',
+    'page arguments' => [1],
+    'access arguments' => ['view member'],
+    'type' => MENU_CALLBACK,
+  ];
+
+  return $items;
+}
+
+function _member_page_view($member, $view_mode = 'full') {
+
+  if (is_numeric($member)) {
+    $member = entity_load('member', [$member]);
+    $member = reset($member);
+  }
+
+  $member->content = [];
+  $member->title = _member_entity_label($member);
+  field_attach_prepare_view('member', [$member->id => $member], $view_mode);
+  entity_prepare_view('member', [$member->id => $member]);
+  $member->content += field_attach_view('member', $member, $view_mode);
+  $member->content += [
+    '#theme' => 'member',
+    '#element' => $member,
+    '#view_mode' => $view_mode,
+    '#language' => LANGUAGE_NONE,
+  ];
+
+  return $member->content;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function member_theme($existing, $type, $theme, $path) {
+  return [
+    'member' => [
+      'variables' => ['element' => NULL],
+      'template' => 'member'
+    ],
+  ];
+}

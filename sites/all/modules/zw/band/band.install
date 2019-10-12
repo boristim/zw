@@ -1,0 +1,41 @@
+<?php
+function band_enable() {
+  cache_clear_all();
+  foreach (BandFields::fields() as $field_name => $field_info) {
+    if (!field_info_field($field_info['field_name'])) {
+      field_create_field($field_info);
+    }
+  }
+  foreach (BandFields::instances() as $field_name => $field_instance) {
+    if (!field_info_instance($field_instance['entity_type'], $field_instance['field_name'], $field_instance['bundle'])) {
+      field_create_instance($field_instance);
+    }
+  }
+  cache_clear_all();
+}
+
+function band_schema() {
+  variable_set('site_frontpage', 'bands');
+  $schema['bands_band'] = [
+    'description' => 'Stores bands',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique item ID',
+      ],
+      'name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'Band name',
+        'not null' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'member_name' => ['name'],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  return $schema;
+}

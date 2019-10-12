@@ -1,0 +1,11 @@
+name = Member
+description = Member of band
+files[] = inc/MemberFields.php
+files[] = inc/MemberUIController.php
+files[] = inc/EntityMember.php
+files[] = inc/MemberController.php
+dependencies[] = entity
+dependencies[] = date
+version = "7.x-0.1"
+core = "7.x"
+package = "zw"
